@@ -8,13 +8,20 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
-if (!process.env.REPLIT_DOMAINS) {
-  // Fallback for external deployments
+const replitDomains = process.env.REPLIT_DOMAINS;
+if (!replitDomains) {
+  // Fallback to your production/staging domains or "localhost"
+  // Example:
+  // allowedDomains = ['your-service.onrender.com', 'localhost'];
+  // Or simply skip logic that uses this variable
   if (process.env.NODE_ENV === 'production' && process.env.RENDER) {
     process.env.REPLIT_DOMAINS = process.env.RENDER_EXTERNAL_URL || 'localhost:5000';
   } else {
-    throw new Error("Environment variable REPLIT_DOMAINS not provided");
+    process.env.REPLIT_DOMAINS = 'localhost:5000';
   }
+} else {
+  // Use replitDomains logic
+  process.env.REPLIT_DOMAINS = replitDomains;
 }
 
 const getOidcConfig = memoize(
